@@ -22,10 +22,40 @@
 		11CF4CE32D82E08A0020CC76 /* CLI-RandomReminders */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "CLI-RandomReminders"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		116A180E2D90337700E2FED0 /* Exceptions for "SQLite" folder in "CLI-RandomReminders" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			additionalCompilerFlagsByRelativePath = {
+				sqlite3.c = "-w";
+			};
+			target = 11CF4CE22D82E08A0020CC76 /* CLI-RandomReminders */;
+		};
+		116A180F2D90357A00E2FED0 /* Exceptions for "CLI-RandomReminders" folder in "CLI-RandomReminders" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Print.cpp,
+				Reminders.cpp,
+				Spelling.cpp,
+			);
+			target = 11CF4CE22D82E08A0020CC76 /* CLI-RandomReminders */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		11CF4CE52D82E08A0020CC76 /* CLI-RandomReminders */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				116A180F2D90357A00E2FED0 /* Exceptions for "CLI-RandomReminders" folder in "CLI-RandomReminders" target */,
+			);
 			path = "CLI-RandomReminders";
+			sourceTree = "<group>";
+		};
+		11E691642D903280009BC2DD /* SQLite */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				116A180E2D90337700E2FED0 /* Exceptions for "SQLite" folder in "CLI-RandomReminders" target */,
+			);
+			path = SQLite;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -46,6 +76,7 @@
 			children = (
 				11CF4CE52D82E08A0020CC76 /* CLI-RandomReminders */,
 				11CF4CE42D82E08A0020CC76 /* Products */,
+				11E691642D903280009BC2DD /* SQLite */,
 			);
 			sourceTree = "<group>";
 		};
@@ -74,6 +105,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				11CF4CE52D82E08A0020CC76 /* CLI-RandomReminders */,
+				11E691642D903280009BC2DD /* SQLite */,
 			);
 			name = "CLI-RandomReminders";
 			packageProductDependencies = (
@@ -184,6 +216,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -238,6 +271,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				SDKROOT = macosx;
 			};
 			name = Release;

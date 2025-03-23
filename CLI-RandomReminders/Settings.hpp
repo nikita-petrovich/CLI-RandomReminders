@@ -9,8 +9,10 @@
 #define Settings_hpp
 
 #include "Reminders.hpp"
+#include "sqlite3.h"
 
-void addReminder(std::vector<Reminders>& listReminders);
+void addTableToDB(sqlite3 *DB);
+void addReminder(sqlite3 *DB);
 void settings(std::vector<Reminders>& listReminders);
 void disableAll(std::vector<Reminders>& listReminders);
 void disableSingleReminder(Reminders& reminder);

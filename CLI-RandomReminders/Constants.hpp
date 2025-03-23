@@ -8,6 +8,8 @@
 #ifndef Constants_h
 #define Constants_h
 
+#include <string>
+
 namespace Constants {
     constexpr std::string linesVisualDivider { "---\n" };
     constexpr std::string keyWordToStartSpell { "Hey, " };
