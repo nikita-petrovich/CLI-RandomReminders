@@ -24,8 +24,8 @@ This project’s technical choices reflect a focus on learning fundamentals whil
 
 ### ROADMAP
 - ✅ - March 2025 - Working Prototype
+- ⭕️ - This Century - Save Reminders Between Sessions (SQLite)
 - ⭕️ - This Century - Multithreading
-- ⭕️ - This Century - Save Reminders Between Sessions
 - ⭕️ - This Century - Non-Random Repetitive Reminders
 - ⭕️ - This Century - GUI
 - ⭕️ - This Century - Multiplatfrom App
