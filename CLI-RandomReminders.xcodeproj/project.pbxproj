@@ -33,7 +33,6 @@
 		116A180F2D90357A00E2FED0 /* Exceptions for "CLI-RandomReminders" folder in "CLI-RandomReminders" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Print.cpp,
 				Reminders.cpp,
 				Spelling.cpp,
 			);

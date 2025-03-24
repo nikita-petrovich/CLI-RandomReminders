@@ -8,24 +8,24 @@
 #include "Print.hpp"
 #include <iomanip>
 
-void printSingleReminder(const Reminders& r)
-{
-    int days { r.getMaxTimeSchedule() / 1440 };
-    int hours { r.getMaxTimeSchedule() / 60 - days * 24 };
-    int minutes { r.getMaxTimeSchedule() - days * 1440 - hours * 60 };
-    
-    std::cout << (r.getStatus() ? "🔔" : "🔕") << "  ";
-    std::cout << "— time range: " << days << 'd' << hours << 'h' << minutes << 'm' << "  —  ";
-    std::cout << r.getRemind() << '\n';
+int printDB([[maybe_unused]] void *NotUsed, int columns, char **value,
+            [[maybe_unused]] char **columnName) {
+
+    for (int i{3}; i < columns; ++i) {
+        if (i == 3) {
+            std::cout << (std::stoi(value[3]) ? "🔔" : "🔕") << value[3] << '\t';
+        } else {
+            std::cout << value[i] << '\t';
+        }
+    }
+
+    std::cout << '\n';
+
+    return 0;
 }
 
-void printRemindersList(std::vector<Reminders>& listReminders)
-{
-    int i { 1 };
-    
-    for (const auto& r : listReminders)
-    {
-        std::cout << i++ << ")  ";
-        printSingleReminder(r);
-    }
+void printRemindersList(sqlite3 *DB) {
+    std::string sql{"SELECT * FROM REMINDERS;"};
+
+    executeSQL(__PRETTY_FUNCTION__, DB, sql, printDB, nullptr);
 }

@@ -9,9 +9,10 @@
 #define Print_hpp
 
 #include "Reminders.hpp"
+#include "Settings.hpp"
 
-void printSingleReminder(const Reminders& r);
-void printRemindersList(std::vector<Reminders>& listReminders);
-
+int printDB([[maybe_unused]] void *NotUsed, int columns, char **value,
+            [[maybe_unused]] char **columnName);
+void printRemindersList(sqlite3 *DB);
 
 #endif /* Print_hpp */

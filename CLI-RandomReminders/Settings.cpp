@@ -32,34 +32,53 @@ void addTableToDB(sqlite3 *DB) {
                     "ID INTEGER PRIMARY KEY ASC,"
                     "CREATION_TIME INT DEFAULT (unixepoch()),"
                     "NEXT_NOTIFICATION INT DEFAULT (10080),"
-                    "ENABLE BOOLEAN DEFAULT (true),"
+                    "ENABLE INT DEFAULT (1),"
                     "TIME_RANGE INT DEFAULT (10080),"
                     "REMINDER STRING NOT NULL);"};
 
     executeSQL(__PRETTY_FUNCTION__, DB, sql);
 }
 
-// void addReminder(sqlite3 *DB) {
-//     std::cout << Constants::linesVisualDivider;
-//     std::cout << "Write your reminder: ";
-//     std::string reminder{};
-//     std::getline(std::cin >> std::ws, reminder);
-// }
+void addReminder(sqlite3 *DB) {
+    std::cout << Constants::linesVisualDivider;
+    std::cout << "Write your reminder: ";
+    std::string reminder{};
+    std::getline(std::cin >> std::ws, reminder);
 
-// void disableSingleReminder(Reminders& reminder){
+    std::string sql{"INSERT INTO REMINDERS (REMINDER) VALUES ('"};
+    sql.append(reminder).append("');");
+
+    executeSQL(__PRETTY_FUNCTION__, DB, sql);
+}
+
+// void disableSingleReminder(sqlite3 *DB){
 //     reminder.getStatus() ? reminder.setStatus(false) :
 //     reminder.setStatus(true);
 // }
-//
-// void disableAll(std::vector<Reminders>& listReminders)
-//{
-//     //if the first reminder is enabeled, disable all. And vice-versa
-//     bool currentStatus { listReminders[0].getStatus() };
-//
-//     for (auto& r : listReminders)
-//         currentStatus ? r.setStatus(false) : r.setStatus(true);
-// }
-//
+
+int getStatus(void *currentStatus, [[maybe_unused]] int columns, char **value,
+              [[maybe_unused]] char **columnName) {
+
+    *static_cast<int *>(currentStatus) = std::stoi(value[0]);
+
+    return 0;
+}
+
+void disableAll(sqlite3 *DB) {
+    // if the first reminder is enabeled, disable all. And vice-versa
+    std::string sql{"SELECT ENABLE FROM REMINDERS LIMIT 1;"};
+    int currentStatus{0};
+    int *ptrCurrentStatus{&currentStatus};
+    executeSQL(__PRETTY_FUNCTION__, DB, sql, getStatus, ptrCurrentStatus);
+
+    std::string newStatus{};
+    currentStatus ? newStatus = "0" : newStatus = "1";
+    sql = "UPDATE OR REPLACE REMINDERS SET ENABLE='";
+    sql.append(newStatus).append("';");
+
+    executeSQL(__PRETTY_FUNCTION__, DB, sql);
+}
+
 // void changeText(Reminders& reminder)
 //{
 //     std::cout << Constants::linesVisualDivider;

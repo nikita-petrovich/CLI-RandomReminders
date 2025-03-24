@@ -6,7 +6,7 @@
 //
 
 #include "Constants.hpp"
-// #include "Print.hpp"
+#include "Print.hpp"
 // #include "Reminders.hpp"
 #include "Settings.hpp"
 // #include "Spelling.hpp"
@@ -21,66 +21,65 @@ void cleanInputStream() {
     std::cout << "Invalid input. Try again.\n";
 }
 
-// void mainMenu(sqlite3 *DB) {
-//      while (true) {
-//          std::cout << Constants::linesVisualDivider;
-//          std::cout << "Your reminders:\n";
-////         printRemindersList(DB);
-//         std::cout << "Main Menu:\n";
-//         std::cout << "1 - Add new reminder\n";
-//         std::cout << "2 - Settings\n";
-//         std::cout << "3 - Disable/Enable all\n";
-//         std::cout << "0 - Exit\n";
-//
-//         while (true) {
-//             std::cout << "Enter a number to proceed: ";
-//             int choice{};
-//             std::cin >> choice;
-//
-//             if (!std::cin) {
-//                 cleanInputStream();
-//                 continue;
-//             }
-//
-//             std::cin.ignore(std::numeric_limits<std::streamsize>::max(),
-//             '\n');
-//
-//             switch (choice) {
-//             case 1:
-//                 addReminder(DB);
-//                 break;
-//             case 2:
-////                 settings(DB);
-//                 break;
-//             case 3:
-////                 disableAll(DB);
-//                 break;
-//             case 0:
-//                 std::cout << "Are you sure? You won't be able to recieve "
-//                              "reminders (1 - YES; 0 - NO): ";
-//                 std::cin >> choice;
-//                 if (!std::cin) {
-//                     cleanInputStream();
-//                     continue;
-//                 }
-//                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(),
-//                                 '\n');
-//                 if (choice == 1)
-//                     return;
-//                 else if (choice == 0)
-//                     break;
-//
-//                 std::cout << "Incorrect. Try again.\n";
-//                 break;
-//
-//             default:
-//                 std::cout << "Incorrect. Try again.\n";
-//                 continue;
-//             }
-//             break;
-//         }
-//     }
-// }
+void mainMenu(sqlite3 *DB) {
+    while (true) {
+        std::cout << Constants::linesVisualDivider;
+        std::cout << "Your reminders:\n";
+        printRemindersList(DB);
+        std::cout << "Main Menu:\n";
+        std::cout << "1 - Add new reminder\n";
+        std::cout << "2 - Settings\n";
+        std::cout << "3 - Disable/Enable all\n";
+        std::cout << "0 - Exit\n";
+
+        while (true) {
+            std::cout << "Enter a number to proceed: ";
+            int choice{};
+            std::cin >> choice;
+
+            if (!std::cin) {
+                cleanInputStream();
+                continue;
+            }
+
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+            switch (choice) {
+            case 1:
+                addReminder(DB);
+                break;
+            case 2:
+                //                 settings(DB);
+                break;
+            case 3:
+                disableAll(DB);
+                break;
+            case 0:
+                std::cout << "Are you sure? You won't be able to recieve "
+                             "reminders (1 - YES; 0 - NO): ";
+                std::cin >> choice;
+                if (!std::cin) {
+                    cleanInputStream();
+                    continue;
+                }
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(),
+                                '\n');
+                if (choice == 1)
+                    return;
+                else if (choice == 0)
+                    break;
+
+                std::cout << "Incorrect. Try again.\n";
+                break;
+
+            default:
+                std::cout << "Incorrect. Try again.\n";
+                continue;
+            }
+            break;
+        }
+    }
+}
 
 int main() {
     std::string dbLocation{
@@ -100,7 +99,7 @@ int main() {
 
     addTableToDB(dbReminders);
 
-    //    mainMenu(dbReminders);
+    mainMenu(dbReminders);
     //
     //    spellReminders(listReminders);
 
