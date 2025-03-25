@@ -11,8 +11,8 @@
 #include <string>
 
 namespace Constants {
-    constexpr std::string linesVisualDivider { "---\n" };
-    constexpr std::string keyWordToStartSpell { "Hey, " };
-}
+constexpr std::string linesVisualDivider{"---\n"};
+constexpr std::string keyWordToStartSpell{"Hey, "};
+} // namespace Constants
 
 #endif /* Constants_h */

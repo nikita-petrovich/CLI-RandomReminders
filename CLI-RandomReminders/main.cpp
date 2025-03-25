@@ -7,9 +7,8 @@
 
 #include "Constants.hpp"
 #include "Print.hpp"
-// #include "Reminders.hpp"
 #include "Settings.hpp"
-// #include "Spelling.hpp"
+#include "Spelling.hpp"
 #include "sqlite3.h"
 #include <iostream>
 #include <numeric>
@@ -49,7 +48,7 @@ void mainMenu(sqlite3 *DB) {
                 addReminder(DB);
                 break;
             case 2:
-                //                 settings(DB);
+                settings(DB);
                 break;
             case 3:
                 disableAll(DB);
