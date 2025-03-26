@@ -15,7 +15,7 @@ int printTable([[maybe_unused]] void *NotUsed, int columns, char **value,
                [[maybe_unused]] char **columnName);
 int printRaw([[maybe_unused]] void *NotUsed, int columns, char **value,
              [[maybe_unused]] char **columnName);
-void printSingleReminder(sqlite3 *DB, std::int32_t creationTime);
+void printSingleReminder(sqlite3 *DB, int id);
 void printRemindersList(sqlite3 *DB);
 
 #endif /* Print_hpp */

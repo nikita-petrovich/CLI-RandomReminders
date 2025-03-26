@@ -13,7 +13,7 @@
 
 int getData(void *ptrData, [[maybe_unused]] int columns, char **value,
             [[maybe_unused]] char **columnName) {
-    static_cast<std::string *>(ptrData)[0] = value[1];
+    static_cast<std::string *>(ptrData)[0] = value[0];
     static_cast<std::string *>(ptrData)[1] = value[2];
     static_cast<std::string *>(ptrData)[2] = value[4];
     static_cast<std::string *>(ptrData)[3] = value[5];
@@ -24,7 +24,7 @@ int getData(void *ptrData, [[maybe_unused]] int columns, char **value,
 bool checkNotification(sqlite3 *DB, std::string &remind) {
     std::string sql{"SELECT * FROM NOTIFY LIMIT 1"};
 
-    // 0 - CREATION TIME
+    // 0 - ID
     // 1 - NEXT NOTIFICATION
     // 2 - TIME RANGE
     // 3 - remind
@@ -33,7 +33,7 @@ bool checkNotification(sqlite3 *DB, std::string &remind) {
 
     executeSQL(__PRETTY_FUNCTION__, DB, sql, getData, ptrData);
 
-    std::int64_t creationTime = std::stoi(data[0]);
+    int id = std::stoi(data[0]);
     std::int64_t nextNotification =
         std::chrono::minutes(std::stoi(data[1])).count();
     std::int32_t timeRange = std::stoi(data[2]);
@@ -46,7 +46,7 @@ bool checkNotification(sqlite3 *DB, std::string &remind) {
 
     if (timeNow >= nextNotification) {
 
-        updateNextNotification(DB, creationTime, timeRange);
+        updateNextNotification(DB, id, timeRange);
 
         // prevent spelling accumulated reminders, while app has been closed
         if (timeNow >= nextNotification + timeRange / 2) {

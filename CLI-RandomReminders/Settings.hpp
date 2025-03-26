@@ -17,11 +17,11 @@ void addTableToDB(sqlite3 *DB);
 void addReminder(sqlite3 *DB);
 void settings(sqlite3 *DB);
 void disableAll(sqlite3 *DB);
-void disableSingleReminder(sqlite3 *DB, std::int32_t creationTime);
-void changeText(sqlite3 *DB, std::int32_t creationTime);
-void changeTime(sqlite3 *DB, std::int32_t creationTime);
-void deleteReminder(sqlite3 *DB, std::int32_t creationTime);
-void updateNextNotification(sqlite3 *DB, std::int64_t creationTime,
-                            std::int32_t timeRange);
+void disableSingleReminder(sqlite3 *DB,
+                           std::pair<int, std::int32_t> &idAndTimeRange);
+void changeText(sqlite3 *DB, int id);
+void changeTime(sqlite3 *DB, std::pair<int, std::int32_t> &idAndTimeRange);
+void deleteReminder(sqlite3 *DB, int id);
+void updateNextNotification(sqlite3 *DB, int id, std::int32_t timeRange);
 
 #endif /* Settings_hpp */

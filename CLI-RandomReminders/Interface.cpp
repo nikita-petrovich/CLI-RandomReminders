@@ -11,8 +11,8 @@
 #include "g_Vars.hpp"
 #include <iostream>
 
-std::vector<std::int32_t> g_CreationTimeList{};
-std::atomic_bool g_exitApp {false};
+std::vector<std::pair<int, std::int32_t>> g_idAndTimeRangeList{};
+std::atomic_bool g_exitApp{false};
 
 void cleanInputStream() {
     std::cin.clear();
@@ -30,7 +30,7 @@ void mainMenu(sqlite3 *DB) {
 #pragma clang diagnostic pop
 
         std::cout << "Your reminders:\n";
-        g_CreationTimeList.clear();
+        g_idAndTimeRangeList.clear();
         printRemindersList(DB);
         std::cout << "Main Menu:\n";
         std::cout << "1 - Add new reminder\n";
@@ -97,7 +97,7 @@ void settings(sqlite3 *DB) {
 #pragma clang diagnostic pop
 
     std::cout << "Your reminders:\n";
-    g_CreationTimeList.clear();
+    g_idAndTimeRangeList.clear();
     printRemindersList(DB);
     std::size_t reminderIndex{};
 
@@ -116,7 +116,7 @@ void settings(sqlite3 *DB) {
     if (reminderIndex <= 0)
         return;
 
-    if (reminderIndex > g_CreationTimeList.size()) {
+    if (reminderIndex > g_idAndTimeRangeList.size()) {
         std::cout << "There is no reminder.\n";
         return;
     }
@@ -126,7 +126,7 @@ void settings(sqlite3 *DB) {
 
     while (true) {
         std::cout << "The reminder to change:\n";
-        printSingleReminder(DB, g_CreationTimeList[reminderIndex]);
+        printSingleReminder(DB, g_idAndTimeRangeList[reminderIndex].first);
 
         std::cout << "1 - Disable/Enable Notification\n";
         std::cout << "2 - Change Text\n";
@@ -146,16 +146,16 @@ void settings(sqlite3 *DB) {
 
         switch (choice) {
         case 1:
-            disableSingleReminder(DB, g_CreationTimeList[reminderIndex]);
+            disableSingleReminder(DB, g_idAndTimeRangeList[reminderIndex]);
             break;
         case 2:
-            changeText(DB, g_CreationTimeList[reminderIndex]);
+            changeText(DB, g_idAndTimeRangeList[reminderIndex].first);
             break;
         case 3:
-            changeTime(DB, g_CreationTimeList[reminderIndex]);
+            changeTime(DB, g_idAndTimeRangeList[reminderIndex]);
             break;
         case 4:
-            deleteReminder(DB, g_CreationTimeList[reminderIndex]);
+            deleteReminder(DB, g_idAndTimeRangeList[reminderIndex].first);
             return;
         case 0:
             return;

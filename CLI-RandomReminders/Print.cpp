@@ -13,10 +13,10 @@
 int printTable([[maybe_unused]] void *NotUsed, int columns, char **value,
                [[maybe_unused]] char **columnName) {
 
-    g_CreationTimeList.push_back(std::stoi(value[1]));
+    g_idAndTimeRangeList.emplace_back(std::stoi(value[0]), std::stoi(value[4]));
 
     // to print as numbered list
-    std::cout << g_CreationTimeList.size() << ") ";
+    std::cout << g_idAndTimeRangeList.size() << ") ";
 
     for (int i{0}; i < columns; ++i) {
         if (i == 3) {
@@ -49,9 +49,9 @@ int printRaw([[maybe_unused]] void *NotUsed, int columns, char **value,
     return 0;
 }
 
-void printSingleReminder(sqlite3 *DB, std::int32_t creationTime) {
-    std::string sql{"SELECT * FROM REMINDERS WHERE CREATION_TIME = "};
-    sql.append(std::to_string(creationTime)).append(";");
+void printSingleReminder(sqlite3 *DB, int id) {
+    std::string sql{"SELECT * FROM REMINDERS WHERE ID = "};
+    sql.append(std::to_string(id)).append(";");
 
     executeSQL(__PRETTY_FUNCTION__, DB, sql, printRaw, nullptr);
 }

@@ -7,6 +7,7 @@
 
 #include "Settings.hpp"
 #include "Random.hpp"
+#include "g_Vars.hpp"
 #include <sstream>
 
 void cleanInputStream();
@@ -31,7 +32,7 @@ void addTableToDB(sqlite3 *DB) {
     std::string sql{
         "CREATE TABLE IF NOT EXISTS REMINDERS ("
         "ID INTEGER PRIMARY KEY ASC,"
-        "CREATION_TIME INT DEFAULT (unixepoch()),"
+        "CREATION_TIME INT DEFAULT (datetime('now')),"
         "NEXT_NOTIFICATION INT DEFAULT (unixepoch()),"
         "ENABLE INT DEFAULT (1),"
         "TIME_RANGE INT DEFAULT (10080)," // minutes (10080 - 7 days)
@@ -45,8 +46,19 @@ void addReminder(sqlite3 *DB) {
     std::string reminder{};
     std::getline(std::cin >> std::ws, reminder);
 
-    std::string sql{"INSERT INTO REMINDERS (REMINDER) VALUES ('"};
-    sql.append(reminder).append("');");
+    std::int64_t timeNow =
+        std::chrono::duration_cast<std::chrono::minutes>(
+            std::chrono::system_clock::now().time_since_epoch())
+            .count();
+
+    std::int64_t nextNotification{Random::get(1, 10080) + timeNow};
+
+    std::string sql{
+        "INSERT INTO REMINDERS (REMINDER, NEXT_NOTIFICATION) VALUES ('"};
+    sql.append(reminder)
+        .append("', '")
+        .append(std::to_string(nextNotification))
+        .append("');");
 
     executeSQL(__PRETTY_FUNCTION__, DB, sql);
 }
@@ -59,9 +71,10 @@ int getStatus(void *currentStatus, [[maybe_unused]] int columns, char **value,
     return 0;
 }
 
-void disableSingleReminder(sqlite3 *DB, std::int32_t creationTime) {
-    std::string sql{"SELECT ENABLE FROM REMINDERS WHERE CREATION_TIME = "};
-    sql.append(std::to_string(creationTime)).append(";");
+void disableSingleReminder(sqlite3 *DB,
+                           std::pair<int, std::int32_t> &idAndTimeRange) {
+    std::string sql{"SELECT ENABLE FROM REMINDERS WHERE ID = "};
+    sql.append(std::to_string(idAndTimeRange.first)).append(";");
     int currentStatus{0};
     int *ptrCurrentStatus{&currentStatus};
     executeSQL(__PRETTY_FUNCTION__, DB, sql, getStatus, ptrCurrentStatus);
@@ -70,9 +83,13 @@ void disableSingleReminder(sqlite3 *DB, std::int32_t creationTime) {
     currentStatus ? newStatus = "0" : newStatus = "1";
     sql = "UPDATE REMINDERS SET ENABLE = ";
     sql.append(newStatus)
-        .append(" WHERE CREATION_TIME = ")
-        .append(std::to_string(creationTime))
+        .append(" WHERE ID = ")
+        .append(std::to_string(idAndTimeRange.first))
         .append(";");
+
+    if (std::stoi(newStatus)) {
+        updateNextNotification(DB, idAndTimeRange.first, idAndTimeRange.second);
+    }
 
     executeSQL(__PRETTY_FUNCTION__, DB, sql);
 }
@@ -89,10 +106,16 @@ void disableAll(sqlite3 *DB) {
     sql = "UPDATE REMINDERS SET ENABLE='";
     sql.append(newStatus).append("';");
 
+    if (std::stoi(newStatus)) {
+        for (const auto &id : g_idAndTimeRangeList) {
+            updateNextNotification(DB, id.first, id.second);
+        }
+    }
+
     executeSQL(__PRETTY_FUNCTION__, DB, sql);
 }
 
-void changeText(sqlite3 *DB, std::int32_t creationTime) {
+void changeText(sqlite3 *DB, int id) {
     std::cout << "Write new text: ";
     std::string newText{};
     std::getline(std::cin >> std::ws, newText);
@@ -100,8 +123,8 @@ void changeText(sqlite3 *DB, std::int32_t creationTime) {
     std::string sql{"UPDATE REMINDERS SET REMINDER = '"};
     sql.append(newText)
         .append("' ")
-        .append("WHERE CREATION_TIME = ")
-        .append(std::to_string(creationTime))
+        .append("WHERE ID = ")
+        .append(std::to_string(id))
         .append(";");
 
     executeSQL(__PRETTY_FUNCTION__, DB, sql);
@@ -129,7 +152,7 @@ std::int32_t convertUserInputTime(std::string &str) {
     return days * 1440 + hours * 60 + minutes;
 }
 
-void changeTime(sqlite3 *DB, std::int32_t creationTime) {
+void changeTime(sqlite3 *DB, std::pair<int, std::int32_t> &idAndTimeRange) {
     std::int32_t newTime{};
 
     while (true) {
@@ -148,26 +171,28 @@ void changeTime(sqlite3 *DB, std::int32_t creationTime) {
 
     std::string sql{"UPDATE REMINDERS SET TIME_RANGE = "};
     sql.append(std::to_string(newTime))
-        .append(" WHERE CREATION_TIME = ")
-        .append(std::to_string(creationTime))
+        .append(" WHERE ID = ")
+        .append(std::to_string(idAndTimeRange.first))
         .append(";");
 
     executeSQL(__PRETTY_FUNCTION__, DB, sql);
 
+    idAndTimeRange.second = newTime;
+    updateNextNotification(DB, idAndTimeRange.first, idAndTimeRange.second);
+
     std::cout << "New time accepted.\n";
 }
 
-void deleteReminder(sqlite3 *DB, std::int32_t creationTime) {
-    std::string sql{"DELETE FROM REMINDERS WHERE CREATION_TIME = "};
-    sql.append(std::to_string(creationTime)).append(";");
+void deleteReminder(sqlite3 *DB, int id) {
+    std::string sql{"DELETE FROM REMINDERS WHERE ID = "};
+    sql.append(std::to_string(id)).append(";");
 
     executeSQL(__PRETTY_FUNCTION__, DB, sql);
 
     std::cout << "The reminder deleted.\n";
 }
 
-void updateNextNotification(sqlite3 *DB, std::int64_t creationTime,
-                            std::int32_t timeRange) {
+void updateNextNotification(sqlite3 *DB, int id, std::int32_t timeRange) {
     std::int64_t timeNow =
         std::chrono::duration_cast<std::chrono::minutes>(
             std::chrono::system_clock::now().time_since_epoch())
@@ -178,8 +203,8 @@ void updateNextNotification(sqlite3 *DB, std::int64_t creationTime,
     std::string sql = {"UPDATE REMINDERS SET NEXT_NOTIFICATION = '"};
     sql.append(std::to_string(newNextNotification))
         .append("' ")
-        .append("WHERE CREATION_TIME = ")
-        .append(std::to_string(creationTime))
+        .append("WHERE ID = ")
+        .append(std::to_string(id))
         .append(";");
 
     executeSQL(__PRETTY_FUNCTION__, DB, sql, 0, nullptr);
