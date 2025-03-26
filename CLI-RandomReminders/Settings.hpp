@@ -8,9 +8,8 @@
 #ifndef Settings_hpp
 #define Settings_hpp
 
-#include "Reminders.hpp"
 #include "sqlite3.h"
-#include <vector>
+#include <iostream>
 
 void executeSQL(std::string_view pretty_function, sqlite3 *DB, std::string &sql,
                 int (*callback)(void *, int, char **, char **), void *var);
@@ -22,5 +21,7 @@ void disableSingleReminder(sqlite3 *DB, std::int32_t creationTime);
 void changeText(sqlite3 *DB, std::int32_t creationTime);
 void changeTime(sqlite3 *DB, std::int32_t creationTime);
 void deleteReminder(sqlite3 *DB, std::int32_t creationTime);
+void updateNextNotification(sqlite3 *DB, std::int64_t creationTime,
+                            std::int32_t timeRange);
 
 #endif /* Settings_hpp */

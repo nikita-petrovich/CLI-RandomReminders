@@ -6,10 +6,8 @@
 //
 
 #include "Settings.hpp"
-#include "Constants.hpp"
-#include "Print.hpp"
-
-std::vector<std::int32_t> g_CreationTimeList{};
+#include "Random.hpp"
+#include <sstream>
 
 void cleanInputStream();
 
@@ -30,19 +28,19 @@ void executeSQL(std::string_view pretty_function, sqlite3 *DB, std::string &sql,
 }
 
 void addTableToDB(sqlite3 *DB) {
-    std::string sql{"CREATE TABLE IF NOT EXISTS REMINDERS ("
-                    "ID INTEGER PRIMARY KEY ASC,"
-                    "CREATION_TIME INT DEFAULT (unixepoch()),"
-                    "NEXT_NOTIFICATION INT DEFAULT (10080),"
-                    "ENABLE INT DEFAULT (1),"
-                    "TIME_RANGE INT DEFAULT (10080),"
-                    "REMINDER STRING NOT NULL);"};
+    std::string sql{
+        "CREATE TABLE IF NOT EXISTS REMINDERS ("
+        "ID INTEGER PRIMARY KEY ASC,"
+        "CREATION_TIME INT DEFAULT (unixepoch()),"
+        "NEXT_NOTIFICATION INT DEFAULT (unixepoch()),"
+        "ENABLE INT DEFAULT (1),"
+        "TIME_RANGE INT DEFAULT (10080)," // minutes (10080 - 7 days)
+        "REMINDER STRING NOT NULL);"};
 
     executeSQL(__PRETTY_FUNCTION__, DB, sql);
 }
 
 void addReminder(sqlite3 *DB) {
-    std::cout << Constants::linesVisualDivider;
     std::cout << "Write your reminder: ";
     std::string reminder{};
     std::getline(std::cin >> std::ws, reminder);
@@ -95,7 +93,6 @@ void disableAll(sqlite3 *DB) {
 }
 
 void changeText(sqlite3 *DB, std::int32_t creationTime) {
-    std::cout << Constants::linesVisualDivider;
     std::cout << "Write new text: ";
     std::string newText{};
     std::getline(std::cin >> std::ws, newText);
@@ -136,7 +133,6 @@ void changeTime(sqlite3 *DB, std::int32_t creationTime) {
     std::int32_t newTime{};
 
     while (true) {
-        std::cout << Constants::linesVisualDivider;
         std::cout << "Write new time using format 00d00h00m (e.g. 01d00h23m): ";
         std::string newTimeString{};
         std::getline(std::cin >> std::ws, newTimeString);
@@ -170,75 +166,21 @@ void deleteReminder(sqlite3 *DB, std::int32_t creationTime) {
     std::cout << "The reminder deleted.\n";
 }
 
-void settings(sqlite3 *DB) {
-    std::cout << Constants::linesVisualDivider;
-    g_CreationTimeList.clear();
-    printRemindersList(DB);
-    std::size_t reminderIndex{};
+void updateNextNotification(sqlite3 *DB, std::int64_t creationTime,
+                            std::int32_t timeRange) {
+    std::int64_t timeNow =
+        std::chrono::duration_cast<std::chrono::minutes>(
+            std::chrono::system_clock::now().time_since_epoch())
+            .count();
 
-    while (true) {
-        std::cout << "Which reminder would you like to change? (0 to exit): ";
-        std::cin >> reminderIndex;
+    std::int64_t newNextNotification{Random::get(1, timeRange) + timeNow};
 
-        if (!std::cin) {
-            cleanInputStream();
-            continue;
-        }
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        break;
-    }
+    std::string sql = {"UPDATE REMINDERS SET NEXT_NOTIFICATION = '"};
+    sql.append(std::to_string(newNextNotification))
+        .append("' ")
+        .append("WHERE CREATION_TIME = ")
+        .append(std::to_string(creationTime))
+        .append(";");
 
-    if (reminderIndex <= 0)
-        return;
-
-    if (reminderIndex > g_CreationTimeList.size()) {
-        std::cout << "There is no reminder.\n";
-        return;
-    }
-
-    // Adjustment for correct indexing in vector
-    --reminderIndex;
-
-    while (true) {
-        std::cout << Constants::linesVisualDivider;
-        std::cout << "The reminder to change:\n";
-        printSingleReminder(DB, g_CreationTimeList[reminderIndex]);
-
-        std::cout << "1 - Disable/Enable Notification\n";
-        std::cout << "2 - Change Text\n";
-        std::cout << "3 - Change Time\n";
-        std::cout << "4 - Delete\n";
-        std::cout << "0 - Back\n";
-
-        std::cout << "Enter a number to proceed: ";
-        int choice{};
-        std::cin >> choice;
-
-        if (!std::cin) {
-            cleanInputStream();
-            continue;
-        }
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
-        switch (choice) {
-        case 1:
-            disableSingleReminder(DB, g_CreationTimeList[reminderIndex]);
-            break;
-        case 2:
-            changeText(DB, g_CreationTimeList[reminderIndex]);
-            break;
-        case 3:
-            changeTime(DB, g_CreationTimeList[reminderIndex]);
-            break;
-        case 4:
-            deleteReminder(DB, g_CreationTimeList[reminderIndex]);
-            return;
-        case 0:
-            return;
-
-        default:
-            std::cout << "Incorrect. Try again.\n";
-            continue;
-        }
-    }
+    executeSQL(__PRETTY_FUNCTION__, DB, sql, 0, nullptr);
 }

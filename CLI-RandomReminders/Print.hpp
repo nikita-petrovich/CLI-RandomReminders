@@ -8,14 +8,13 @@
 #ifndef Print_hpp
 #define Print_hpp
 
-#include "Reminders.hpp"
-#include "Settings.hpp"
-#include <vector>
+#include "sqlite3.h"
+#include <iostream>
 
-extern std::vector<std::int32_t> g_CreationTimeList;
-
-int printDB([[maybe_unused]] void *NotUsed, int columns, char **value,
-            [[maybe_unused]] char **columnName);
+int printTable([[maybe_unused]] void *NotUsed, int columns, char **value,
+               [[maybe_unused]] char **columnName);
+int printRaw([[maybe_unused]] void *NotUsed, int columns, char **value,
+             [[maybe_unused]] char **columnName);
 void printSingleReminder(sqlite3 *DB, std::int32_t creationTime);
 void printRemindersList(sqlite3 *DB);
 

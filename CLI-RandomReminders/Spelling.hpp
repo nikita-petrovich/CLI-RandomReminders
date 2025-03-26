@@ -8,9 +8,8 @@
 #ifndef Spelling_hpp
 #define Spelling_hpp
 
-#include "Reminders.hpp"
-#include <vector>
+#include "sqlite3.h"
 
-void spellReminders(std::vector<Reminders>& listReminders);
+void spellReminders(sqlite3 *DB);
 
 #endif /* Spelling_hpp */
