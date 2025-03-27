@@ -28,11 +28,13 @@ bool checkNotification(sqlite3 *DB, std::string &remind) {
     // 1 - NEXT NOTIFICATION
     // 2 - TIME RANGE
     // 3 - remind
-    std::array<std::string, 4> data{};
+    std::array<std::string, 4> data{"0", "0", "0", "0"};
     auto *ptrData{&data};
 
     executeSQL(__PRETTY_FUNCTION__, DB, sql, getData, ptrData);
 
+    
+    
     int id = std::stoi(data[0]);
     std::int64_t nextNotification = std::stoi(data[1]);
     std::int32_t timeRange = std::stoi(data[2]);
