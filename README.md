@@ -1,8 +1,6 @@
 # 🔔 Hey, It Is Your Random Reminder!
 
 ------------
-###### CURRENT STAGE: WORKING PROTOTYPE
-
 ### THE KEY IDEA
 Struggling to stay on track? Traditional reminders often fail because we tune out repetitive alerts — they become background noise. This project tackles procrastination with a smarter approach: randomized, surprise reminders that you can't ignore.
 
@@ -24,8 +22,9 @@ This project’s technical choices reflect a focus on learning fundamentals whil
 
 ### ROADMAP
 - ✅ - March 2025 - Working Prototype
-- ⭕️ - This Century - Save Reminders Between Sessions (SQLite)
+- ✅ - March 2025 - Save Reminders Between Sessions (SQLite) - in another branch for now
 - ⭕️ - This Century - Multithreading
+- ⭕️ - This Century - Background process and .app bundle
 - ⭕️ - This Century - Non-Random Repetitive Reminders
 - ⭕️ - This Century - GUI
 - ⭕️ - This Century - Multiplatfrom App
