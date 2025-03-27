@@ -34,8 +34,7 @@ bool checkNotification(sqlite3 *DB, std::string &remind) {
     executeSQL(__PRETTY_FUNCTION__, DB, sql, getData, ptrData);
 
     int id = std::stoi(data[0]);
-    std::int64_t nextNotification =
-        std::chrono::minutes(std::stoi(data[1])).count();
+    std::int64_t nextNotification = std::stoi(data[1]);
     std::int32_t timeRange = std::stoi(data[2]);
     remind = data[3];
 
@@ -48,7 +47,7 @@ bool checkNotification(sqlite3 *DB, std::string &remind) {
 
         updateNextNotification(DB, id, timeRange);
 
-        // prevent spelling accumulated reminders, while app has been closed
+        // Prevent spelling accumulated reminders, while app has been closed
         if (timeNow >= nextNotification + timeRange / 2) {
             return 0;
         }
@@ -59,6 +58,8 @@ bool checkNotification(sqlite3 *DB, std::string &remind) {
 }
 
 void spellReminders(sqlite3 *DB) {
+    // We are checking only the first row of the VIEW on the enabled reminders,
+    // ordered by NEXT_NOTIFICATION ASC
     std::string sql{"CREATE TEMP VIEW IF NOT EXISTS NOTIFY "
                     "AS SELECT * FROM REMINDERS "
                     "WHERE ENABLE = 1 "

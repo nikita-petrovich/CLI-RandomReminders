@@ -10,8 +10,13 @@
 #include "g_Vars.hpp"
 #include <sstream>
 
-void cleanInputStream();
-
+/// Wrapped SQLite sqlite3_exec function, which prints error
+/// - Parameters:
+///   - pretty_function: name of caller function
+///   - DB: database connecton
+///   - sql: SQL query
+///   - callback: function to handle recieved data
+///   - var: the first parameter to send into callback()
 void executeSQL(std::string_view pretty_function, sqlite3 *DB, std::string &sql,
                 int (*callback)(void *, int, char **, char **) = 0,
                 void *var = nullptr) {
@@ -23,20 +28,23 @@ void executeSQL(std::string_view pretty_function, sqlite3 *DB, std::string &sql,
         std::cout << pretty_function << ": executeSQL() error - " << error
                   << '\n';
         sqlite3_free(error);
-    } else {
+    } /*else {
         std::cout << pretty_function << ": success.\n";
-    }
+    }*/
 }
 
 void addTableToDB(sqlite3 *DB) {
-    std::string sql{
-        "CREATE TABLE IF NOT EXISTS REMINDERS ("
-        "ID INTEGER PRIMARY KEY ASC,"
-        "CREATION_TIME INT DEFAULT (datetime('now')),"
-        "NEXT_NOTIFICATION INT DEFAULT (unixepoch()),"
-        "ENABLE INT DEFAULT (1),"
-        "TIME_RANGE INT DEFAULT (10080)," // minutes (10080 - 7 days)
-        "REMINDER STRING NOT NULL);"};
+
+    // - NEXT_NOTIFICATION: unixepoch() is temporary data
+    // - TIME_RANGE: Minutes (10080 - 7 days). Range
+    // to generate NEXT_NOTIFICATION
+    std::string sql{"CREATE TABLE IF NOT EXISTS REMINDERS ("
+                    "ID INTEGER PRIMARY KEY ASC,"
+                    "CREATION_TIME INT DEFAULT (datetime('now')),"
+                    "NEXT_NOTIFICATION INT DEFAULT (unixepoch()),"
+                    "ENABLE INT DEFAULT (1),"
+                    "TIME_RANGE INT DEFAULT (10080),"
+                    "REMINDER STRING NOT NULL);"};
 
     executeSQL(__PRETTY_FUNCTION__, DB, sql);
 }
@@ -95,7 +103,7 @@ void disableSingleReminder(sqlite3 *DB,
 }
 
 void disableAll(sqlite3 *DB) {
-    // if the first reminder is enabeled, disable all. And vice-versa
+    // If the first reminder is enabeled, disable all. And vice-versa
     std::string sql{"SELECT ENABLE FROM REMINDERS LIMIT 1;"};
     int currentStatus{0};
     int *ptrCurrentStatus{&currentStatus};
@@ -142,8 +150,10 @@ std::int32_t convertUserInputTime(std::string &str) {
     str.erase(std::remove(str.begin(), str.end(), ' '), str.end());
 
     // Check for the right format
+    if (str.size() != 9)
+        return -1;
     if (std::tolower(str[2]) != 'd' || std::tolower(str[5]) != 'h' ||
-        std::tolower(str[8]) != 'm' || str.size() != 9)
+        std::tolower(str[8]) != 'm')
         return -1;
 
     std::stringstream ss{str};
@@ -156,7 +166,7 @@ void changeTime(sqlite3 *DB, std::pair<int, std::int32_t> &idAndTimeRange) {
     std::int32_t newTime{};
 
     while (true) {
-        std::cout << "Write new time using format 00d00h00m (e.g. 01d00h23m): ";
+        std::cout << "Write new time using format 00d00h00m: ";
         std::string newTimeString{};
         std::getline(std::cin >> std::ws, newTimeString);
 
