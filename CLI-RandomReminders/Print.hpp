@@ -11,6 +11,7 @@
 #include "sqlite3.h"
 #include <iostream>
 
+std::string convertTimeRangeToFormat(std::int32_t time);
 int printTable([[maybe_unused]] void *NotUsed, int columns, char **value,
                [[maybe_unused]] char **columnName);
 int printRaw([[maybe_unused]] void *NotUsed, int columns, char **value,

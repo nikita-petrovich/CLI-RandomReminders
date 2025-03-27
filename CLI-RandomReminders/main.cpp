@@ -22,9 +22,9 @@ int main() {
         std::cout << __PRETTY_FUNCTION__ << ": sqlite3_open error- "
                   << sqlite3_errmsg(dbReminders) << '\n';
         sqlite3_close(dbReminders);
-    } else {
+    } /*else {
         std::cout << "Database Reminders.db opened.\n";
-    }
+    }*/
 
     addTableToDB(dbReminders);
 
@@ -35,9 +35,9 @@ int main() {
     if (dbReturnCode) {
         std::cout << __PRETTY_FUNCTION__ << ": sqlite3_close error- "
                   << sqlite3_errmsg(dbReminders) << '\n';
-    } else {
+    } /*else {
         std::cout << "Database Reminders.db closed.\n";
-    }
+    }*/
 
     return 0;
 }

@@ -10,41 +10,44 @@
 #include "g_Vars.hpp"
 #include <iostream>
 
-int printTable([[maybe_unused]] void *NotUsed, int columns, char **value,
-               [[maybe_unused]] char **columnName) {
+std::string convertTimeRangeToFormat(std::int32_t time) {
+    int days{time / 1440};
+    int hours{time / 60 - days * 24};
+    int minutes{time - days * 1440 - hours * 60};
+
+    std::string format{};
+
+    return format.append(std::to_string(days))
+        .append("d")
+        .append(std::to_string(hours))
+        .append("h")
+        .append(std::to_string(minutes))
+        .append("m");
+}
+
+int printTable([[maybe_unused]] void *NotUsed, [[maybe_unused]] int columns,
+               char **value, [[maybe_unused]] char **columnName) {
 
     g_idAndTimeRangeList.emplace_back(std::stoi(value[0]), std::stoi(value[4]));
 
     // to print as numbered list
     std::cout << g_idAndTimeRangeList.size() << ") ";
-
-    for (int i{0}; i < columns; ++i) {
-        if (i == 3) {
-            std::cout << (std::stoi(value[3]) ? "🔔" : "🔕") << value[3]
-                      << '\t';
-        } else {
-            std::cout << value[i] << '\t';
-        }
-    }
-
-    std::cout << '\n';
+    std::cout << (std::stoi(value[3]) ? "🔔" : "🔕") << ' ';
+    std::cout << "| range: "
+              << convertTimeRangeToFormat(std::stoi(value[4])) << " |\t";
+    std::cout << value[5] << '\n';
 
     return 0;
 }
 
-int printRaw([[maybe_unused]] void *NotUsed, int columns, char **value,
+int printRaw([[maybe_unused]] void *NotUsed, [[maybe_unused]] int columns, char **value,
              [[maybe_unused]] char **columnName) {
 
-    for (int i{0}; i < columns; ++i) {
-        if (i == 3) {
-            std::cout << (std::stoi(value[3]) ? "🔔" : "🔕") << value[3]
-                      << '\t';
-        } else {
-            std::cout << value[i] << '\t';
-        }
-    }
-
-    std::cout << '\n';
+    std::cout << (std::stoi(value[3]) ? "🔔" : "🔕") << ' ';
+    std::cout << "| range: "
+              << convertTimeRangeToFormat(std::stoi(value[4])) << " |\t";
+    std::cout << value[5] << '\n';
+    std::cout << "Created: " << value[1] << '\n';
 
     return 0;
 }

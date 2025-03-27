@@ -23,9 +23,9 @@ void executeSQL(std::string_view pretty_function, sqlite3 *DB, std::string &sql,
         std::cout << pretty_function << ": executeSQL() error - " << error
                   << '\n';
         sqlite3_free(error);
-    } else {
+    } /*else {
         std::cout << pretty_function << ": success.\n";
-    }
+    }*/
 }
 
 void addTableToDB(sqlite3 *DB) {
@@ -142,8 +142,10 @@ std::int32_t convertUserInputTime(std::string &str) {
     str.erase(std::remove(str.begin(), str.end(), ' '), str.end());
 
     // Check for the right format
+    if (str.size() != 9)
+        return -1;
     if (std::tolower(str[2]) != 'd' || std::tolower(str[5]) != 'h' ||
-        std::tolower(str[8]) != 'm' || str.size() != 9)
+        std::tolower(str[8]) != 'm')
         return -1;
 
     std::stringstream ss{str};

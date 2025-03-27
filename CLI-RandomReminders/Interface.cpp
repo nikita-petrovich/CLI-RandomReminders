@@ -17,7 +17,7 @@ std::atomic_bool g_exitApp{false};
 void cleanInputStream() {
     std::cin.clear();
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    std::cout << "Invalid input. Try again.\n";
+    std::cout << "❗️ Invalid input. Try again.\n";
 }
 
 void mainMenu(sqlite3 *DB) {
@@ -32,7 +32,7 @@ void mainMenu(sqlite3 *DB) {
         std::cout << "Your reminders:\n";
         g_idAndTimeRangeList.clear();
         printRemindersList(DB);
-        std::cout << "Main Menu:\n";
+        std::cout << "\nMain Menu:\n";
         std::cout << "1 - Add new reminder\n";
         std::cout << "2 - Settings\n";
         std::cout << "3 - Disable/Enable all\n";
@@ -71,16 +71,16 @@ void mainMenu(sqlite3 *DB) {
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(),
                                 '\n');
                 if (choice == 1) {
-                    g_exitApp = true;
+                    // g_exitApp = true;
                     return;
                 } else if (choice == 0)
                     break;
 
-                std::cout << "Incorrect. Try again.\n";
+                std::cout << "❗️ Incorrect. Try again.\n";
                 break;
 
             default:
-                std::cout << "Incorrect. Try again.\n";
+                std::cout << "❗️ Incorrect. Try again.\n";
                 continue;
             }
             break;
@@ -102,7 +102,7 @@ void settings(sqlite3 *DB) {
     std::size_t reminderIndex{};
 
     while (true) {
-        std::cout << "Which reminder would you like to change? (0 to exit): ";
+        std::cout << "\nWhich reminder would you like to change? (0 to exit): ";
         std::cin >> reminderIndex;
 
         if (!std::cin) {
@@ -117,7 +117,7 @@ void settings(sqlite3 *DB) {
         return;
 
     if (reminderIndex > g_idAndTimeRangeList.size()) {
-        std::cout << "There is no reminder.\n";
+        std::cout << "❗️ There is no reminder.\n";
         return;
     }
 
@@ -125,10 +125,15 @@ void settings(sqlite3 *DB) {
     --reminderIndex;
 
     while (true) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpedantic"
+        // clean terminal window
+        std::system("printf '\33c\e[3J'");
+#pragma clang diagnostic pop
+
         std::cout << "The reminder to change:\n";
         printSingleReminder(DB, g_idAndTimeRangeList[reminderIndex].first);
-
-        std::cout << "1 - Disable/Enable Notification\n";
+        std::cout << "\n1 - Disable/Enable Notification\n";
         std::cout << "2 - Change Text\n";
         std::cout << "3 - Change Time\n";
         std::cout << "4 - Delete\n";
@@ -161,7 +166,7 @@ void settings(sqlite3 *DB) {
             return;
 
         default:
-            std::cout << "Incorrect. Try again.\n";
+            std::cout << "❗️ Incorrect. Try again.\n";
             continue;
         }
     }
