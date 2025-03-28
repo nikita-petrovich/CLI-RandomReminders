@@ -75,7 +75,7 @@ void mainMenu(sqlite3 *DB) {
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(),
                                 '\n');
                 if (choice == 1) {
-                    // g_exitApp = true;
+                    g_exitApp = true;
                     return;
                 } else if (choice == 0)
                     break;

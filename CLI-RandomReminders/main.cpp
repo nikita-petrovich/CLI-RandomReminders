@@ -10,6 +10,7 @@
 #include "Spelling.hpp"
 #include "sqlite3.h"
 #include <iostream>
+#include <thread>
 
 int main() {
     std::string dbLocation{
@@ -28,8 +29,11 @@ int main() {
 
     addTableToDB(dbReminders);
 
+    std::thread spellThread{spellReminders, dbReminders};
+
     mainMenu(dbReminders);
-    spellReminders(dbReminders);
+    
+    spellThread.join();
 
     dbReturnCode = sqlite3_close(dbReminders);
     if (dbReturnCode) {
